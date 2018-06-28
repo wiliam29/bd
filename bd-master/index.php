@@ -1,116 +1,129 @@
 <?php
-//including the database connection file
-include_once("config.php");
-
-//fetching data in descending order (lastest entry first)
-//$result = mysql_query("SELECT * FROM users ORDER BY id DESC"); // mysql_query is deprecated
-$result = mysqli_query($mysqli, "SELECT * FROM users ORDER BY id DESC"); // using mysqli_query instead
+require 'conexao.php';
+// Recebe o termo de pesquisa se existir
+$termo = (isset($_GET['termo'])) ? $_GET['termo'] : '';
+// Verifica se o termo de pesquisa está vazio, se estiver executa uma consulta completa
+if (empty($termo)):
+	$conexao = conexao::getInstance();
+	$sql = 'SELECT 	idAluno, nomeAluno, emailAluno, celAluno, cursoAluno, status, foto FROM tab_alunos';
+	$stm = $conexao->prepare($sql);
+	$stm->execute();
+	$geral = $stm->fetchAll(PDO::FETCH_OBJ);
+else:
+	// Executa uma consulta baseada no termo de pesquisa passado como parâmetro
+	$conexao = conexao::getInstance();
+	$sql = 'SELECT 	idAluno, nomeAluno, emailAluno, celAluno, cursoAluno, status, foto FROM tab_alunos WHERE nomeAluno LIKE :nomeAluno OR status LIKE :status';
+	
+$stm = $conexao->prepare($sql);
+	$stm->bindValue(':nomeAluno', $termo.'%');
+	$stm->bindValue(':status', $termo.'%');
+	$stm->execute();
+	$geral = $stm->fetchAll(PDO::FETCH_OBJ);
+endif;
 ?>
-
+<!DOCTYPE html>
 <html>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Cursinho</title>
-<link rel="stylesheet" type="text/css" href="css/theme.css" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
-<script>
-   var StyleFile = "theme" + document.cookie.charAt(6) + ".css";
-   document.writeln('<link rel="stylesheet" type="text/css" href="css/' + StyleFile + '">');
-</script>
-<!--[if IE]>
-<link rel="stylesheet" type="text/css" href="css/ie-sucks.css" />
-<![endif]-->
+    <meta charset="utf-8">
+	<title>Cursinho - Cadastro</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/custom.css">
 </head>
-
 <body>
+<div class='container'>
+<fieldset>
+		<!-- Cabeçalho da Listagem -->
+	<legend><h1>Cursinho</h1></legend>
 
-<div id="container">
-    	<div id="header">
-        	<h2>Cursinho solidario 29 de Abril</h2>
-    <div id="topmenu">
-            	<ul>
-                	
-                    
-                    
-              </ul>
-          </div>
-      </div>
-<a href="add.html">Add New Data</a><br/><br/>
+			<!-- Formulário de Pesquisa -->
+			<form action="" method="get" id='form-contato' class="form-horizontal col-md-10">
+				<label class="col-md-2 control-label" for="termo">Pesquisar</label>
+				<div class='col-md-7'>
+			    	<input type="text" class="form-control" id="termo" name="termo" placeholder="Infome o Nome ou Status">
+				</div>
+			    <button type="submit" class="btn btn-danger">Pesquisar</button>
+			    <a href='index.php' class="btn btn-danger">Ver Todos</a>
+				</form>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
-	<table width='80%' border=0>
+			<!-- Link para página de cadastro -->
+		</div>
+<article class="container">
+		<hr>			
+		<a href='cadastro_artista.php' class="btn btn-danger"> Professores</a>
+		<a href='cadastro_aluno.php' class="btn btn-danger"> Alunos</a>
+		<a href='cadastro_curso.php' class="btn btn-danger"> Cursos</a>
 
-	<tr bgcolor='#CCCCCC'>
-		<td>Name</td>
-		<td>Age</td>
-		<td>Email</td>
-		<td>Update</td>
-	</tr>
-	<?php 
-	//while($res = mysql_fetch_array($result)) { // mysql_fetch_array is deprecated, we need to use mysqli_fetch_array 
-	while($res = mysqli_fetch_array($result)) { 		
-		echo "<tr>";
-		echo "<td>".$res['name']."</td>";
-		echo "<td>".$res['age']."</td>";
-		echo "<td>".$res['email']."</td>";	
-		echo "<td><a href=\"edit.php?id=$res[id]\">Edit</a> | <a href=\"delete.php?id=$res[id]\" onClick=\"return confirm('Are you sure you want to delete?')\">Delete</a></td>";		
-	}
-	?>
-	</table>
-	
-	
-	 <div id="sidebar">
-  				<ul>
-                	<li><h3><a href="#" class="house">inicio</a></h3>
-                        <ul>
-                        	<li><a href="index.php" class="report">inicio</a></li>
-                    		<li><a href="#" class="report_seo">-----------</a></li>
-                            <li><a href="#" class="search">-----------</a></li>
-                        </ul>
-                    </li>
-                    <li><h3><a href="#" class="folder_table">-----------</a></h3>
-          				<ul>
-                        	<li><a href="#" class="addorder">-----------</a></li>
-                          <li><a href="#" class="shipping">-----------</a></li>
-                            <li><a href="#" class="invoices">-----------</a></li>
-                        </ul>
-                        <li><h3><a href="#" class="user">professor</a></h3>
-                            <ul>
-                              <li><a href="cadasto_prof.html" class="useradd">Adicionar Professor</a></li>
-                              
-                              <li><a href="pesquisa_prof.html" class="search">pesquisar professor</a></li>
-                              
-                          </ul>
-                      </li>
-                        <li><h3><a href="#" class="user">Coordenador</a></h3>
-                            <ul>
-                              <li><a href="cadasto_coordenador.html" class="useradd">Adicionar Coordenador</a></li>
-                                                                                         
-                          </ul>
-                            <li><h3><a href="#" class="user">Coordenador de materia</a></h3>
-                            <ul>
-                              <li><a href="cadasto_comateria.html" class="useradd">Adicionar C. materia</a></li>
-                                                                                         
-                          </ul>
-                      </li>
-                  <li><h3><a href="#" class="user">Aluno</a></h3>
-          				<ul>
-                            <li><a href="cadasto_aluno.html" class="useradd">Adicionar aluno</a></li>
-                            
-            				<li><a href="pesquisa_aluno.html" class="search">pesquisar aluno</a></li>
-                            <li><a href="#" class="report">presensa</a></li>                            
-                        </ul>
-                    </li>
-				</ul>       
-          </div>
-      </div>
-        
-        
+		<a href='index.php' class="btn btn-danger"> Voltar a Home</a>
 
-        </div>
-</div>
+		<div class='clearfix'></div>
+</article>	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<?php if(!empty($geral)):?>
+<div class="table-responsive">
+			
+				<!-- Tabela de geral -->
+				<table class="table table-hover">
+					<tr class='active'>
+					<center><th>Foto</th>
+					<center>	<th>Nome</th> 	</center>
+					<center>	<th>E-mail</th> </center>
+					<center>	<th>Celular</th></center>
+					<center>	<th>Curso</th>  </center>
+					<center>	<th>Status</th> </center>
+					<center>	<th>Ação</th>   </center>
+					</tr>
+					<?php foreach($geral as $geral):?>
+						<tr>
+							<td><img src='fotos/<?=$geral->foto?>' height='100' width='100'></td>
+							<center><td><?=$geral->nomeAluno?></td></center>
+						<center>	<td><?=$geral->emailAluno?></td></center>
+							<center><td><?=$geral->celAluno?></td></center>
+						<center>	<td><?=$geral->cursoAluno?></td></center>
+						<center>	<td><?=$geral->status?></td></center>
+						<td>
+								<a href='editar_aluno.php?idAluno=<?=$geral->idAluno?>' class="btn btn-danger">Editar</a>
+								
+								<a href='deletar_aluno.php?idAluno=<?=$geral->idAluno?>' class="btn" >Excluir</a>
+
+						</tr>	
+						
+						
+					<?php endforeach;?>
+			
+
+						<?php else: ?>
+
+		<!-- Mensagem caso não exista geral ou não encontrado  -->
+		<h3 class="text-center text-primary">Não existem Alunos cadastrados!</h3>
+		<?php endif; ?>
+		</fieldset>
+		</div>
+		</div>
 </body>
 </html>
-
-
